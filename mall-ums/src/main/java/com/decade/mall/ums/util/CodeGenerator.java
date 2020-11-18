@@ -15,21 +15,20 @@ public class CodeGenerator {
         // 全局配置
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig.setActiveRecord(true) // AR模式
-                .setAuthor("decade")
+                .setAuthor("李东杰")
                 .setOutputDir("E:\\mall\\mall-ums\\src\\main\\java")
                 .setFileOverride(true) // 文件覆盖
                 .setIdType(IdType.AUTO) // 主键策略
                 .setServiceName("%sService") // 设置生成Service接口首字母是否为I
                 .setBaseResultMap(true)
                 .setBaseColumnList(true) // 设置基本SQL片段
-                .setSwagger2(true)
-                .setFileOverride(true);
+                .setSwagger2(true);
 
         // 数据源配置
         DataSourceConfig dataSourceConfig = new DataSourceConfig();
         dataSourceConfig.setDbType(DbType.MYSQL)
                 .setDriverName("com.mysql.cj.jdbc.Driver")
-                .setUrl("jdbc:mysql://121.36.39.185:3306/mall?useUnicode=true&useSSL=false&characterEncoding=utf8")
+                .setUrl("jdbc:mysql://121.36.39.185:3306/mall_ums?useUnicode=true&useSSL=false&characterEncoding=utf8")
                 .setUsername("root")
                 .setPassword("123456");
 
@@ -40,7 +39,7 @@ public class CodeGenerator {
                 .setColumnNaming(NamingStrategy.underline_to_camel) // 下划线转驼峰
                 .setEntityLombokModel(true)
                 .setTablePrefix("ums_")
-                .setInclude("ums_admin", "ums_role", "ums_permission", "ums_admin_role_relation", "ums_role_permission_relation", "ums_admin_permission_relation")
+//                .setInclude("ums_admin", "ums_role", "ums_permission", "ums_admin_role_relation", "ums_role_permission_relation", "ums_admin_permission_relation")
                 .setRestControllerStyle(true);
 
         // 包配置

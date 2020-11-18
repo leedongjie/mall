@@ -15,7 +15,9 @@ public enum ResultCodeEnum {
     SUCCESS("00000", "成功"),
 
     // 失败状态码
-    FAILURE("B0001", "系统执行出错");
+    FAILURE("B0001", "系统执行出错"),
+    ACCESS_DENIED("B0002", "访问被拒绝"),
+    AUTHENTICATION_FAILURE("444", "认证失败了");
 
     private final String code;
 
