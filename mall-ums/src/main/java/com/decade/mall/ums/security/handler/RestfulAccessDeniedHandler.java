@@ -1,7 +1,7 @@
-package com.decade.mall.ums.component;
+package com.decade.mall.ums.security.handler;
 
 import cn.hutool.json.JSONUtil;
-import com.decade.mall.ums.util.Result;
+import com.decade.mall.ums.util.CommonResult;
 import com.decade.mall.ums.util.ResultCodeEnum;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * 用户没有权限时的处理
+ */
 @Component
 public class RestfulAccessDeniedHandler implements AccessDeniedHandler {
 
@@ -19,8 +22,10 @@ public class RestfulAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request,
                        HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        response.getWriter()
-                .println(JSONUtil.parse(Result.failure(ResultCodeEnum.ACCESS_DENIED)));
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=utf-8");
+        CommonResult failure = CommonResult.failure(ResultCodeEnum.ACCESS_UNAUTHORIZED);
+        response.getWriter().println(JSONUtil.parse(failure));
         response.getWriter().flush();
     }
 }

@@ -2,6 +2,7 @@ package com.decade.mall.ums.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.decade.mall.ums.entity.User;
+import com.decade.mall.ums.util.CommonResult;
 
 /**
  * <p>
@@ -12,5 +13,7 @@ import com.decade.mall.ums.entity.User;
  * @since 2020-11-18
  */
 public interface UserService extends IService<User> {
+
+    CommonResult login(String username, String password);
 
 }

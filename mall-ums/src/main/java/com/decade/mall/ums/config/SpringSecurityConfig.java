@@ -1,7 +1,11 @@
 package com.decade.mall.ums.config;
 
-import com.decade.mall.ums.component.RestfulAuthenticationFailureHandler;
-import com.decade.mall.ums.component.RestfulAuthenticationSuccessHandler;
+import com.decade.mall.ums.security.filter.JwtAuthorizationTokenFilter;
+import com.decade.mall.ums.security.handler.RestfulAccessDeniedHandler;
+import com.decade.mall.ums.security.handler.RestfulAuthenticationEntryPoint;
+import com.decade.mall.ums.security.handler.RestfulAuthenticationFailureHandler;
+import com.decade.mall.ums.security.handler.RestfulAuthenticationSuccessHandler;
+import com.decade.mall.ums.security.service.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,75 +15,62 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 /**
  * SpringSecurity的配置
- * 使用@EnableGlobalMethodSecurity注解可以解锁@PreAuthorize @PostAuthorize
+ * 使用@EnableGlobalMethodSecurity注解可以解锁@PreAuthorize @PostAuthorize 进行方法级别的权限
  */
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final AdminUserDetailsService adminUserDetailsService;
+    private final MyUserDetailsService myUserDetailsService;
+
+    private final RestfulAuthenticationSuccessHandler restfulAuthenticationSuccessHandler;
+
+    private final RestfulAuthenticationFailureHandler restfulAuthenticationFailureHandler;
+
+    private final RestfulAccessDeniedHandler restfulAccessDeniedHandler;
+
+    private final RestfulAuthenticationEntryPoint restfulAuthenticationEntryPoint;
 
     @Autowired
-    private RestfulAuthenticationSuccessHandler restfulAuthenticationSuccessHandler;
-
-    @Autowired
-    private RestfulAuthenticationFailureHandler restfulAuthenticationFailureHandler;
-
-    @Autowired
-    public SpringSecurityConfig(AdminUserDetailsService adminUserDetailsService) {
-        this.adminUserDetailsService = adminUserDetailsService;
+    public SpringSecurityConfig(MyUserDetailsService myUserDetailsService,
+                                RestfulAuthenticationSuccessHandler restfulAuthenticationSuccessHandler,
+                                RestfulAuthenticationFailureHandler restfulAuthenticationFailureHandler,
+                                RestfulAccessDeniedHandler restfulAccessDeniedHandler,
+                                RestfulAuthenticationEntryPoint restfulAuthenticationEntryPoint) {
+        this.myUserDetailsService = myUserDetailsService;
+        this.restfulAuthenticationSuccessHandler = restfulAuthenticationSuccessHandler;
+        this.restfulAuthenticationFailureHandler = restfulAuthenticationFailureHandler;
+        this.restfulAccessDeniedHandler = restfulAccessDeniedHandler;
+        this.restfulAuthenticationEntryPoint = restfulAuthenticationEntryPoint;
     }
+
+    @Autowired
+    private JwtAuthorizationTokenFilter jwtAuthenticationTokenFilter;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(adminUserDetailsService)
+        // 一旦这里写东西,下面必须有passwordEncoder
+        auth.userDetailsService(myUserDetailsService)
                 .passwordEncoder(passwordEncoder());
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-//        http.csrf()
-//                .disable()
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .authorizeRequests()
-//                .antMatchers(HttpMethod.GET,
-//                        "/",
-//                        "/*.html",
-//                        "/favicon.ico",
-//                        "/**/*.html",
-//                        "/**/*.css",
-//                        "/**/*.js",
-//                        "/swagger-resources/**",
-//                        "/v2/api-docs/**"
-//                ).permitAll()   // 不拦截静态资源以及swagger
-//                .antMatchers("/admin/login", "/admin/register")// 对登录注册要允许匿名访问
-//                .permitAll()
-//                .antMatchers(HttpMethod.OPTIONS)//跨域请求会先进行一次options请求
-//                .permitAll()
-//                .anyRequest()// 除上面外的所有请求全部需要鉴权认证
-//                .authenticated()
-//                .and()
-//                .formLogin()// 开启SpringSecurity默认的登录界面
-//                .successHandler(restfulAuthenticationSuccessHandler) // 认证成功后的处理逻辑
-//                .failureHandler(restfulAuthenticationFailureHandler); // 认证失败后的处理逻辑
-
-
-//        http.authorizeRequests()
-//                .antMatchers("/admin/**")
-//                .hasRole("r1")
-//                .and()
-
-        http.authorizeRequests().anyRequest().authenticated();
-
-        http.formLogin()// 开启SpringSecurity默认的登录界面
-                .successHandler(restfulAuthenticationSuccessHandler) // 认证成功后的处理逻辑
-                .failureHandler(restfulAuthenticationFailureHandler); // 认证失败后的处理逻辑
+        http.csrf().disable();
+        http.authorizeRequests()
+                .antMatchers("/user/login")
+                .permitAll()
+                .anyRequest()
+                .authenticated();
+        http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.exceptionHandling()
+                .accessDeniedHandler(restfulAccessDeniedHandler) // 访问被拒绝,没有权限
+                .authenticationEntryPoint(restfulAuthenticationEntryPoint); // 没有登录或者Token过期
     }
 
     /**

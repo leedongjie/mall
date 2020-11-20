@@ -1,8 +1,8 @@
-package com.decade.mall.ums.component;
+package com.decade.mall.ums.security.handler;
 
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
-import com.decade.mall.ums.util.Result;
+import com.decade.mall.ums.util.CommonResult;
 import com.decade.mall.ums.util.ResultCodeEnum;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -24,8 +24,8 @@ public class RestfulAuthenticationFailureHandler implements AuthenticationFailur
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json;charset=utf-8");
         PrintWriter writer = response.getWriter();
-        Result result = new Result(ResultCodeEnum.AUTHENTICATION_FAILURE, exception.getMessage());
-        JSON parse = JSONUtil.parse(result);
+        CommonResult failure = CommonResult.failure(ResultCodeEnum.ACCESS_UNAUTHORIZED, exception.getMessage());
+        JSON parse = JSONUtil.parse(failure);
         writer.write(parse.toString());
         writer.flush();
         writer.close();

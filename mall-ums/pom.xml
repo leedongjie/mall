@@ -94,11 +94,11 @@
             <artifactId>hutool-all</artifactId>
             <version>5.4.7</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.bitbucket.b_c/jose4j -->
+        <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
         <dependency>
-            <groupId>org.bitbucket.b_c</groupId>
-            <artifactId>jose4j</artifactId>
-            <version>0.7.2</version>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
         </dependency>
     </dependencies>
 

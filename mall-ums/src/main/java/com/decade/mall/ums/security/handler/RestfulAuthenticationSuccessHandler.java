@@ -1,8 +1,8 @@
-package com.decade.mall.ums.component;
+package com.decade.mall.ums.security.handler;
 
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
-import com.decade.mall.ums.util.Result;
+import com.decade.mall.ums.util.CommonResult;
 import com.decade.mall.ums.util.ResultCodeEnum;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -29,8 +29,10 @@ public class RestfulAuthenticationSuccessHandler implements AuthenticationSucces
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json;charset=utf-8");
         PrintWriter writer = response.getWriter();
-        Result result = new Result(ResultCodeEnum.SUCCESS, null);
-        JSON parse = JSONUtil.parse(result);
+        Object credentials = authentication.getCredentials();
+        System.out.println(credentials);
+        CommonResult commonResult = new CommonResult(ResultCodeEnum.SUCCESS, null);
+        JSON parse = JSONUtil.parse(commonResult);
         writer.write(parse.toString());
         writer.flush();
         writer.close();

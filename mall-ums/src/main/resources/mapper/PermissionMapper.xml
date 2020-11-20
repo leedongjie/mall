@@ -15,9 +15,26 @@
         <result column="gmt_modified" property="gmtModified"/>
     </resultMap>
 
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        id, name, description, icon, type, uri, enable, gmt_create, gmt_modified
-    </sql>
+    <select id="listPermissionsByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT t5.id           AS id,
+               t5.name         AS name,
+               t5.description  AS description,
+               t5.icon         AS icon,
+               t5.type         AS type,
+               t5.uri          AS uri,
+               t5.enable       AS enable,
+               t5.gmt_create   AS gmtCreate,
+               t5.gmt_modified AS gmtModified
+        FROM ums_user AS t1
+                 LEFT JOIN ums_user_role AS t2
+                           ON t1.id = t2.user_id
+                 LEFT JOIN ums_role AS t3
+                           ON t2.role_id = t3.id
+                 LEFT JOIN ums_role_permission AS t4
+                           ON t3.id = t4.role_id
+                 LEFT JOIN ums_permission AS t5
+                           ON t4.permission_id = t5.id
+        WHERE t1.username = #{username};
+    </select>
 
 </mapper>
